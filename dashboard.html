@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard UMKM</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 1.3rem;
+            color: #0d6efd;
+            font-weight: bold;
+        }
+
+        .card p {
+            margin: 5px 0;
+            font-size: 1.5rem;
+            color: #111827;
+            font-weight: bold;
+        }
+
+        .card span {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="logo1.png" alt="UMKM Go Logo">
+            <h2>UMKM Go</h2>
+        </div>
+        <ul>
+            <li><a href="dashboard.html" class="active">Dashboard</a></li>
+            <li><a href="umkm.html">UMKM</a></li>
+            <li><a href="tambahproduk.html">Tambah Produk</a></li>
+            <li><a href="datapelanggan.html">Data Pelanggan</a></li>
+            <li><a href="laporanpenjualan.html">Laporan Penjualan</a></li>
+            <li><a href="laporanpendapatan.html">Laporan Pendapatan</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <header>
+            <h1>Selamat Datang, Admin</h1>
+            <p>Gambaran Umum Kinerja UMKM</p>
+        </header>
+        <section class="overview">
+            <div class="card">
+                <h3>Total Pendapatan</h3>
+                <p id="totalPendapatan">Rp0</p>
+            </div>
+            <div class="card">
+                <h3>Jumlah Pelanggan</h3>
+                <p id="jumlahPelanggan">0</p>
+            </div>
+            <div class="card">
+                <h3>Total Produk Terjual</h3>
+                <p id="totalProdukTerjual">0</p>
+            </div>
+            <div class="card">
+                <h3>Jumlah UMKM Terdaftar</h3>
+                <p id="totalUMKM">0</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            // Ambil data pendapatan
+            const dashboardData = JSON.parse(localStorage.getItem('dashboardData')) || { totalPendapatan: 0, jumlahPelanggan: 0 };
+            document.getElementById('totalPendapatan').innerText = `Rp${dashboardData.totalPendapatan.toLocaleString()}`;
+            document.getElementById('jumlahPelanggan').innerText = dashboardData.jumlahPelanggan;
+
+            // Ambil data produk terjual
+            const dashboardSalesData = JSON.parse(localStorage.getItem('dashboardSalesData')) || { totalSales: 0 };
+            document.getElementById('totalProdukTerjual').innerText = dashboardSalesData.totalSales;
+
+            // Ambil data UMKM
+            const dashboardUMKMData = JSON.parse(localStorage.getItem('dashboardUMKMData')) || { totalUMKM: 0 };
+            document.getElementById('totalUMKM').innerText = dashboardUMKMData.totalUMKM;
+        });
+    </script>
+</body>
+</html>

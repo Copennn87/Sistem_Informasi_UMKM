@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Pendapatan</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #102a42;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        table th {
+            background-color: #f0f0f0;
+            color: #102a42;
+            font-weight: bold;
+        }
+
+        .actions button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .actions .edit {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        .actions .edit:hover {
+            background-color: #e0a800;
+        }
+
+        .actions .delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .actions .delete:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="logo1.png" alt="UMKM Go Logo">
+            <h2>UMKM Go</h2>
+        </div>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="umkm.html">UMKM</a></li>
+            <li><a href="tambahproduk.html">Tambah Produk</a></li>
+            <li><a href="datapelanggan.html">Data Pelanggan</a></li>
+            <li><a href="laporanpenjualan.html">Laporan Penjualan</a></li>
+            <li><a href="laporanpendapatan.html" class="active">Laporan Pendapatan</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <h1>Laporan Pendapatan</h1>
+            <form id="pendapatanForm">
+                <div class="form-group">
+                    <label for="bulan">Bulan</label>
+                    <input type="text" id="bulan" placeholder="Masukkan bulan (contoh: Januari)" required>
+                </div>
+                <div class="form-group">
+                    <label for="total">Total Pendapatan</label>
+                    <input type="number" id="total" placeholder="Masukkan total pendapatan" required>
+                </div>
+                <div class="form-group">
+                    <label for="pelanggan">Jumlah Pelanggan</label>
+                    <input type="number" id="pelanggan" placeholder="Masukkan jumlah pelanggan" required>
+                </div>
+                <button type="submit" class="btn">Tambah Laporan</button>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Bulan</th>
+                        <th>Total Pendapatan</th>
+                        <th>Jumlah Pelanggan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="pendapatanTableBody">
+                    <!-- Data laporan pendapatan akan ditampilkan di sini -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const pendapatanForm = document.getElementById('pendapatanForm');
+        const pendapatanTableBody = document.getElementById('pendapatanTableBody');
+
+        function renderPendapatanTable() {
+            const pendapatanData = JSON.parse(localStorage.getItem('pendapatanData')) || [];
+            pendapatanTableBody.innerHTML = '';
+            pendapatanData.forEach((pendapatan, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${pendapatan.bulan}</td>
+                    <td>Rp${pendapatan.total.toLocaleString()}</td>
+                    <td>${pendapatan.pelanggan}</td>
+                    <td class="actions">
+                        <button class="edit" onclick="editPendapatan(${index})">Edit</button>
+                        <button class="delete" onclick="deletePendapatan(${index})">Hapus</button>
+                    </td>
+                `;
+                pendapatanTableBody.appendChild(row);
+            });
+            updateDashboard();
+        }
+
+        function addPendapatan(event) {
+            event.preventDefault();
+            const bulan = document.getElementById('bulan').value;
+            const total = parseInt(document.getElementById('total').value);
+            const pelanggan = parseInt(document.getElementById('pelanggan').value);
+
+            const pendapatanData = JSON.parse(localStorage.getItem('pendapatanData')) || [];
+            pendapatanData.push({ bulan, total, pelanggan });
+            localStorage.setItem('pendapatanData', JSON.stringify(pendapatanData));
+
+            renderPendapatanTable();
+            pendapatanForm.reset();
+        }
+
+        function editPendapatan(index) {
+            const pendapatanData = JSON.parse(localStorage.getItem('pendapatanData')) || [];
+            const pendapatan = pendapatanData[index];
+
+            document.getElementById('bulan').value = pendapatan.bulan;
+            document.getElementById('total').value = pendapatan.total;
+            document.getElementById('pelanggan').value = pendapatan.pelanggan;
+
+            deletePendapatan(index); // Hapus data sementara untuk memperbarui.
+        }
+
+        function deletePendapatan(index) {
+            const pendapatanData = JSON.parse(localStorage.getItem('pendapatanData')) || [];
+            pendapatanData.splice(index, 1);
+            localStorage.setItem('pendapatanData', JSON.stringify(pendapatanData));
+
+            renderPendapatanTable();
+        }
+
+        function updateDashboard() {
+            const pendapatanData = JSON.parse(localStorage.getItem('pendapatanData')) || [];
+            const totalPendapatan = pendapatanData.reduce((sum, data) => sum + data.total, 0);
+            const jumlahPelanggan = pendapatanData.reduce((sum, data) => sum + data.pelanggan, 0);
+
+            localStorage.setItem('dashboardData', JSON.stringify({ totalPendapatan, jumlahPelanggan }));
+        }
+
+        pendapatanForm.addEventListener('submit', addPendapatan);
+        document.addEventListener('DOMContentLoaded', renderPendapatanTable);
+    </script>
+</body>
+</html>

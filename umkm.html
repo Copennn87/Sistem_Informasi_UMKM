@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMKM - CRUD</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #102a42;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        table th {
+            background-color: #f0f0f0;
+            color: #102a42;
+            font-weight: bold;
+        }
+
+        .actions button {
+            margin-right: 5px;
+        }
+
+        .actions .edit {
+            background-color: #ffc107;
+        }
+
+        .actions .delete {
+            background-color: #dc3545;
+        }
+
+        .actions button {
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .actions .edit:hover {
+            background-color: #e0a800;
+        }
+
+        .actions .delete:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="logo1.png" alt="UMKM Go Logo">
+            <h2>UMKM Go</h2>
+        </div>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="umkm.html" class="active">UMKM</a></li>
+            <li><a href="tambahproduk.html">Tambah Produk</a></li>
+            <li><a href="datapelanggan.html">Data Pelanggan</a></li>
+            <li><a href="laporanpenjualan.html">Laporan Penjualan</a></li>
+            <li><a href="laporanpendapatan.html">Laporan Pendapatan</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <h1>Kelola Data UMKM</h1>
+            <form id="umkmForm">
+                <div class="form-group">
+                    <label for="name">Nama UMKM</label>
+                    <input type="text" id="name" placeholder="Masukkan nama UMKM" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Deskripsi</label>
+                    <input type="text" id="description" placeholder="Masukkan deskripsi" required>
+                </div>
+                <button type="submit" class="btn">Tambah UMKM</button>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama UMKM</th>
+                        <th>Deskripsi</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="umkmTableBody">
+                    <!-- Data UMKM akan ditampilkan di sini -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const umkmForm = document.getElementById('umkmForm');
+        const umkmTableBody = document.getElementById('umkmTableBody');
+
+        let umkmData = [];
+
+        function renderTable() {
+    umkmTableBody.innerHTML = '';
+    umkmData = JSON.parse(localStorage.getItem('umkmData')) || [];
+    umkmData.forEach((umkm, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${umkm.name}</td>
+            <td>${umkm.description}</td>
+            <td class="actions">
+                <button class="edit" onclick="editUMKM(${index})">Edit</button>
+                <button class="delete" onclick="deleteUMKM(${index})">Hapus</button>
+            </td>
+        `;
+        umkmTableBody.appendChild(row);
+    });
+    updateDashboardUMKM();
+}
+
+function addUMKM(event) {
+    event.preventDefault();
+    const name = document.getElementById('name').value;
+    const description = document.getElementById('description').value;
+
+    umkmData = JSON.parse(localStorage.getItem('umkmData')) || [];
+    umkmData.push({ name, description });
+    localStorage.setItem('umkmData', JSON.stringify(umkmData));
+
+    renderTable();
+    umkmForm.reset();
+}
+
+function deleteUMKM(index) {
+    umkmData = JSON.parse(localStorage.getItem('umkmData')) || [];
+    umkmData.splice(index, 1);
+    localStorage.setItem('umkmData', JSON.stringify(umkmData));
+
+    renderTable();
+}
+
+function updateDashboardUMKM() {
+    const umkmData = JSON.parse(localStorage.getItem('umkmData')) || [];
+    const totalUMKM = umkmData.length;
+    localStorage.setItem('dashboardUMKMData', JSON.stringify({ totalUMKM }));
+}
+
+umkmForm.addEventListener('submit', addUMKM);
+document.addEventListener('DOMContentLoaded', renderTable);
+
+    </script>
+</body>
+</html>

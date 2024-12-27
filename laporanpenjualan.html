@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Penjualan</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #102a42;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        table th {
+            background-color: #f0f0f0;
+            color: #102a42;
+            font-weight: bold;
+        }
+
+        .actions button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .actions .edit {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        .actions .edit:hover {
+            background-color: #e0a800;
+        }
+
+        .actions .delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .actions .delete:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="logo1.png" alt="UMKM Go Logo">
+            <h2>UMKM Go</h2>
+        </div>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="umkm.html">UMKM</a></li>
+            <li><a href="tambahproduk.html">Tambah Produk</a></li>
+            <li><a href="datapelanggan.html">Data Pelanggan</a></li>
+            <li><a href="laporanpenjualan.html" class="active">Laporan Penjualan</a></li>
+            <li><a href="laporanpendapatan.html">Laporan Pendapatan</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <h1>Laporan Penjualan</h1>
+            <form id="salesForm">
+                <div class="form-group">
+                    <label for="salesDate">Tanggal</label>
+                    <input type="date" id="salesDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="productSold">Nama Produk</label>
+                    <input type="text" id="productSold" placeholder="Masukkan nama produk" required>
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Jumlah</label>
+                    <input type="number" id="quantity" placeholder="Masukkan jumlah produk terjual" required>
+                </div>
+                <div class="form-group">
+                    <label for="totalPayment">Total Pembayaran</label>
+                    <input type="number" id="totalPayment" placeholder="Masukkan total pembayaran" required>
+                </div>
+                <button type="submit" class="btn">Tambah Laporan</button>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Tanggal</th>
+                        <th>Nama Produk</th>
+                        <th>Jumlah</th>
+                        <th>Total Pembayaran</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                    <!-- Data laporan penjualan akan ditampilkan di sini -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const salesForm = document.getElementById('salesForm');
+        const salesTableBody = document.getElementById('salesTableBody');
+
+        function renderSalesTable() {
+            const salesData = JSON.parse(localStorage.getItem('salesData')) || [];
+            salesTableBody.innerHTML = '';
+            salesData.forEach((sale, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${sale.date}</td>
+                    <td>${sale.product}</td>
+                    <td>${sale.quantity}</td>
+                    <td>Rp${sale.total.toLocaleString()}</td>
+                    <td class="actions">
+                        <button class="edit" onclick="editSale(${index})">Edit</button>
+                        <button class="delete" onclick="deleteSale(${index})">Hapus</button>
+                    </td>
+                `;
+                salesTableBody.appendChild(row);
+            });
+            updateDashboardSales();
+        }
+
+        function addSale(event) {
+            event.preventDefault();
+            const date = document.getElementById('salesDate').value;
+            const product = document.getElementById('productSold').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const total = parseInt(document.getElementById('totalPayment').value);
+
+            const salesData = JSON.parse(localStorage.getItem('salesData')) || [];
+            salesData.push({ date, product, quantity, total });
+            localStorage.setItem('salesData', JSON.stringify(salesData));
+
+            renderSalesTable();
+            salesForm.reset();
+        }
+
+        function editSale(index) {
+            const salesData = JSON.parse(localStorage.getItem('salesData')) || [];
+            const sale = salesData[index];
+
+            document.getElementById('salesDate').value = sale.date;
+            document.getElementById('productSold').value = sale.product;
+            document.getElementById('quantity').value = sale.quantity;
+            document.getElementById('totalPayment').value = sale.total;
+
+            deleteSale(index);
+        }
+
+        function deleteSale(index) {
+            const salesData = JSON.parse(localStorage.getItem('salesData')) || [];
+            salesData.splice(index, 1);
+            localStorage.setItem('salesData', JSON.stringify(salesData));
+
+            renderSalesTable();
+        }
+
+        function updateDashboardSales() {
+            const salesData = JSON.parse(localStorage.getItem('salesData')) || [];
+            const totalSales = salesData.reduce((sum, sale) => sum + sale.quantity, 0);
+
+            localStorage.setItem('dashboardSalesData', JSON.stringify({ totalSales }));
+        }
+
+        salesForm.addEventListener('submit', addSale);
+        document.addEventListener('DOMContentLoaded', renderSalesTable);
+    </script>
+</body>
+</html>

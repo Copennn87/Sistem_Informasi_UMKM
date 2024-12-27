@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Produk</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #102a42;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        table th {
+            background-color: #f0f0f0;
+            color: #102a42;
+            font-weight: bold;
+        }
+
+        .actions button {
+            margin-right: 5px;
+        }
+
+        .actions .edit {
+            background-color: #ffc107;
+        }
+
+        .actions .delete {
+            background-color: #dc3545;
+        }
+
+        .actions button {
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .actions .edit:hover {
+            background-color: #e0a800;
+        }
+
+        .actions .delete:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="logo1.png" alt="UMKM Go Logo">
+            <h2>UMKM Go</h2>
+        </div>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="umkm.html">UMKM</a></li>
+            <li><a href="tambahproduk.html" class="active">Tambah Produk</a></li>
+            <li><a href="datapelanggan.html">Data Pelanggan</a></li>
+            <li><a href="laporanpenjualan.html">Laporan Penjualan</a></li>
+            <li><a href="laporanpendapatan.html">Laporan Pendapatan</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <h1>Tambah Produk</h1>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="productName">Nama Produk</label>
+                    <input type="text" id="productName" placeholder="Masukkan nama produk" required>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Harga Produk</label>
+                    <input type="number" id="productPrice" placeholder="Masukkan harga produk" required>
+                </div>
+                <div class="form-group">
+                    <label for="productStock">Stok Produk</label>
+                    <input type="number" id="productStock" placeholder="Masukkan jumlah stok" required>
+                </div>
+                <div class="form-group">
+                    <label for="productCategory">Kategori Produk</label>
+                    <select id="productCategory" required>
+                        <option value="">Pilih Kategori</option>
+                        <option value="Makanan">Makanan</option>
+                        <option value="Minuman">Minuman</option>
+                        <option value="Pakaian">Pakaian</option>
+                        <option value="Kerajinan">Kerajinan</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Tambah Produk</button>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Produk</th>
+                        <th>Harga</th>
+                        <th>Stok</th>
+                        <th>Kategori</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <!-- Data produk akan ditampilkan di sini -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const productForm = document.getElementById('productForm');
+        const productTableBody = document.getElementById('productTableBody');
+
+        let productData = [];
+
+        function renderTable() {
+            productTableBody.innerHTML = '';
+            productData.forEach((product, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${product.name}</td>
+                    <td>Rp${product.price}</td>
+                    <td>${product.stock}</td>
+                    <td>${product.category}</td>
+                    <td class="actions">
+                        <button class="edit" onclick="editProduct(${index})">Edit</button>
+                        <button class="delete" onclick="deleteProduct(${index})">Hapus</button>
+                    </td>
+                `;
+                productTableBody.appendChild(row);
+            });
+        }
+
+        function addProduct(event) {
+            event.preventDefault();
+            const name = document.getElementById('productName').value;
+            const price = document.getElementById('productPrice').value;
+            const stock = document.getElementById('productStock').value;
+            const category = document.getElementById('productCategory').value;
+
+            productData.push({ name, price, stock, category });
+            renderTable();
+
+            productForm.reset();
+        }
+
+        function editProduct(index) {
+            const product = productData[index];
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productStock').value = product.stock;
+            document.getElementById('productCategory').value = product.category;
+
+            deleteProduct(index);
+        }
+
+        function deleteProduct(index) {
+            productData.splice(index, 1);
+            renderTable();
+        }
+
+        productForm.addEventListener('submit', addProduct);
+
+        renderTable();
+    </script>
+</body>
+</html>
