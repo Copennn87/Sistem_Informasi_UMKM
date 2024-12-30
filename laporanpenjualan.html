@@ -105,6 +105,7 @@
     </style>
 </head>
 <body>
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
     <div class="sidebar">
         <div class="logo">
             <img src="logo1.png" alt="UMKM Go Logo">
@@ -229,6 +230,11 @@
 
         salesForm.addEventListener('submit', addSale);
         document.addEventListener('DOMContentLoaded', renderSalesTable);
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
     </script>
 </body>
 </html>

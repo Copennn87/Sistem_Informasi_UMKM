@@ -108,6 +108,7 @@
     </style>
 </head>
 <body>
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
     <div class="sidebar">
         <div class="logo">
             <img src="logo1.png" alt="UMKM Go Logo">
@@ -173,7 +174,12 @@
         const productForm = document.getElementById('productForm');
         const productTableBody = document.getElementById('productTableBody');
 
-        let productData = [];
+        // Ambil data produk dari localStorage
+        let productData = JSON.parse(localStorage.getItem('productData')) || [];
+
+        function saveToLocalStorage() {
+            localStorage.setItem('productData', JSON.stringify(productData));
+        }
 
         function renderTable() {
             productTableBody.innerHTML = '';
@@ -202,6 +208,7 @@
             const category = document.getElementById('productCategory').value;
 
             productData.push({ name, price, stock, category });
+            saveToLocalStorage();
             renderTable();
 
             productForm.reset();
@@ -219,12 +226,19 @@
 
         function deleteProduct(index) {
             productData.splice(index, 1);
+            saveToLocalStorage();
             renderTable();
         }
 
         productForm.addEventListener('submit', addProduct);
 
+        // Render tabel saat halaman dimuat
         renderTable();
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
     </script>
 </body>
 </html>

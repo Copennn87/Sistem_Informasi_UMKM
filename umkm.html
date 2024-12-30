@@ -107,6 +107,7 @@
     </style>
 </head>
 <body>
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
     <div class="sidebar">
         <div class="logo">
             <img src="logo1.png" alt="UMKM Go Logo">
@@ -157,56 +158,72 @@
         const umkmTableBody = document.getElementById('umkmTableBody');
 
         let umkmData = [];
+        let editingIndex = null; // Menyimpan indeks saat edit
 
         function renderTable() {
-    umkmTableBody.innerHTML = '';
-    umkmData = JSON.parse(localStorage.getItem('umkmData')) || [];
-    umkmData.forEach((umkm, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${umkm.name}</td>
-            <td>${umkm.description}</td>
-            <td class="actions">
-                <button class="edit" onclick="editUMKM(${index})">Edit</button>
-                <button class="delete" onclick="deleteUMKM(${index})">Hapus</button>
-            </td>
-        `;
-        umkmTableBody.appendChild(row);
-    });
-    updateDashboardUMKM();
-}
+            umkmTableBody.innerHTML = '';
+            umkmData = JSON.parse(localStorage.getItem('umkmData')) || [];
+            umkmData.forEach((umkm, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${umkm.name}</td>
+                    <td>${umkm.description}</td>
+                    <td class="actions">
+                        <button class="edit" onclick="editUMKM(${index})">Edit</button>
+                        <button class="delete" onclick="deleteUMKM(${index})">Hapus</button>
+                    </td>
+                `;
+                umkmTableBody.appendChild(row);
+            });
+            updateDashboardUMKM();
+        }
 
-function addUMKM(event) {
-    event.preventDefault();
-    const name = document.getElementById('name').value;
-    const description = document.getElementById('description').value;
+        function addUMKM(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
 
-    umkmData = JSON.parse(localStorage.getItem('umkmData')) || [];
-    umkmData.push({ name, description });
-    localStorage.setItem('umkmData', JSON.stringify(umkmData));
+            if (editingIndex !== null) {
+                // Simpan perubahan jika sedang mengedit
+                umkmData[editingIndex] = { name, description };
+                editingIndex = null;
+            } else {
+                // Tambah data baru
+                umkmData.push({ name, description });
+            }
 
-    renderTable();
-    umkmForm.reset();
-}
+            localStorage.setItem('umkmData', JSON.stringify(umkmData));
+            renderTable();
+            umkmForm.reset();
+        }
 
-function deleteUMKM(index) {
-    umkmData = JSON.parse(localStorage.getItem('umkmData')) || [];
-    umkmData.splice(index, 1);
-    localStorage.setItem('umkmData', JSON.stringify(umkmData));
+        function editUMKM(index) {
+            const umkm = umkmData[index];
+            document.getElementById('name').value = umkm.name;
+            document.getElementById('description').value = umkm.description;
+            editingIndex = index; // Simpan indeks yang sedang diedit
+        }
 
-    renderTable();
-}
+        function deleteUMKM(index) {
+            umkmData.splice(index, 1);
+            localStorage.setItem('umkmData', JSON.stringify(umkmData));
+            renderTable();
+        }
 
-function updateDashboardUMKM() {
-    const umkmData = JSON.parse(localStorage.getItem('umkmData')) || [];
-    const totalUMKM = umkmData.length;
-    localStorage.setItem('dashboardUMKMData', JSON.stringify({ totalUMKM }));
-}
+        function updateDashboardUMKM() {
+            const umkmData = JSON.parse(localStorage.getItem('umkmData')) || [];
+            const totalUMKM = umkmData.length;
+            localStorage.setItem('dashboardUMKMData', JSON.stringify({ totalUMKM }));
+        }
 
-umkmForm.addEventListener('submit', addUMKM);
-document.addEventListener('DOMContentLoaded', renderTable);
+        umkmForm.addEventListener('submit', addUMKM);
+        document.addEventListener('DOMContentLoaded', renderTable);
 
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
     </script>
 </body>
 </html>
