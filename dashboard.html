@@ -4,26 +4,156 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard UMKM</title>
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet"> <!-- href="dashboard.css" -->
     <style>
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        /* Reset dan Tata Letak */
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            background-color: #f4f7fc;
         }
 
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #102a42;
+            color: white;
+            height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        .main-content {
+            margin-left: 290px; /* Memberi lebih banyak ruang untuk sidebar */
+            padding: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+
+        .toggle-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #2563eb;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .toggle-btn {
+                display: block;
+            }
+        }
+
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo img {
+            width: 80px;
+            height: auto;
+        }
+
+        .logo h2 {
+            margin: 10px 0 0;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: white;
+            padding: 15px 20px;
+            display: block;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar ul li a.active,
+        .sidebar ul li a:hover {
+            background-color: #2563eb;
+        }
+
+        /* Konten Utama */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            background-color: #f9fafb;
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: #102a42;
+            font-weight: bold;
+        }
+
+        header p {
+            margin: 5px 0 0;
+            color: #6b7280;
+            font-size: 1rem;
+        }
+
+        /* Kartu Overview */
         .overview {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
         }
 
         .card {
             background: white;
-            padding: 20px;
+            padding: 20px 25px;
             border-radius: 12px;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s, box-shadow 0.3s;
@@ -53,9 +183,67 @@
             font-size: 0.9rem;
             color: #6b7280;
         }
+
+        /* Tabel Transaksi Terbaru */
+        .latest-transactions {
+            margin-top: 40px;
+        }
+
+        .latest-transactions h2 {
+            font-size: 1.5rem;
+            color: #102a42;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .table-container {
+            overflow-x: auto; /* Membuat tabel scrollable pada layar kecil */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        table th {
+            background-color: #0d6efd;
+            color: white;
+            font-weight: bold;
+        }
+
+        table td {
+            color: #555;
+        }
+
+        @media (max-width: 768px) {
+            table {
+                font-size: 0.9rem;
+            }
+
+            .overview {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 15px;
+            }
+        }
     </style>
 </head>
 <body>
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
     <div class="sidebar">
         <div class="logo">
             <img src="logo1.png" alt="UMKM Go Logo">
@@ -93,23 +281,98 @@
                 <p id="totalUMKM">0</p>
             </div>
         </section>
+        
+        <section class="chart">
+            <h2>Statistik Penjualan Bulanan</h2>
+            <canvas id="salesChart"></canvas>
+        </section>
+        
+        <section class="latest-transactions">
+            <h2>Transaksi Terbaru</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Tanggal</th>
+                        <th>Produk</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="latestTransactions">
+                    <!-- Data transaksi terbaru akan ditampilkan di sini -->
+                </tbody>
+            </table>
+        </section>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
-            // Ambil data pendapatan
-            const dashboardData = JSON.parse(localStorage.getItem('dashboardData')) || { totalPendapatan: 0, jumlahPelanggan: 0 };
+            const defaultDashboardData = { totalPendapatan: 15000000, jumlahPelanggan: 120 };
+            const dashboardData = JSON.parse(localStorage.getItem('dashboardData')) || defaultDashboardData;
             document.getElementById('totalPendapatan').innerText = `Rp${dashboardData.totalPendapatan.toLocaleString()}`;
             document.getElementById('jumlahPelanggan').innerText = dashboardData.jumlahPelanggan;
 
-            // Ambil data produk terjual
-            const dashboardSalesData = JSON.parse(localStorage.getItem('dashboardSalesData')) || { totalSales: 0 };
+            const defaultSalesData = { totalSales: 30 };
+            const dashboardSalesData = JSON.parse(localStorage.getItem('dashboardSalesData')) || defaultSalesData;
             document.getElementById('totalProdukTerjual').innerText = dashboardSalesData.totalSales;
 
-            // Ambil data UMKM
-            const dashboardUMKMData = JSON.parse(localStorage.getItem('dashboardUMKMData')) || { totalUMKM: 0 };
+            const defaultUMKMData = { totalUMKM: 15 };
+            const dashboardUMKMData = JSON.parse(localStorage.getItem('dashboardUMKMData')) || defaultUMKMData;
             document.getElementById('totalUMKM').innerText = dashboardUMKMData.totalUMKM;
+
+            localStorage.setItem('dashboardData', JSON.stringify(dashboardData));
+            localStorage.setItem('dashboardSalesData', JSON.stringify(dashboardSalesData));
+            localStorage.setItem('dashboardUMKMData', JSON.stringify(dashboardUMKMData));
+
+            const salesData = {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Pendapatan (Rp)',
+                    data: [3000000, 4000000, 5000000, 7000000, 6000000, 8000000],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2
+                }]
+            };
+
+            const salesChart = new Chart(document.getElementById('salesChart'), {
+                type: 'line',
+                data: salesData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+
+            const transactions = [
+                { tanggal: '2024-12-01', produk: 'Produk A', total: 50000 },
+                { tanggal: '2024-12-02', produk: 'Produk B', total: 75000 },
+                { tanggal: '2024-12-03', produk: 'Produk C', total: 125000 },
+            ];
+
+            const latestTransactions = document.getElementById('latestTransactions');
+            transactions.forEach((trx, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${trx.tanggal}</td>
+                    <td>${trx.produk}</td>
+                    <td>Rp${trx.total.toLocaleString()}</td>
+                `;
+                latestTransactions.appendChild(row);
+            });
         });
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
     </script>
 </body>
 </html>
